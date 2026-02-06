@@ -11,32 +11,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: npm install || true
+      - name: Instalar dependências
+        run: npm install
 
-      - name: SAST - Semgrep
+      - name: SAST com Semgrep
         uses: returntocorp/semgrep-action@v1
-        with:
-          config: "p/default"
 
-      - name: Dependency Scan - Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: fs
-          severity: HIGH,CRITICAL
+      - name: Scan de dependências (npm audit)
+        run: npm audit --audit-level=high
 
-      - name: Build Docker image
+      - name: Build da imagem Docker
         run: docker build -t secure-api .
 
-      - name: DAST - OWASP ZAP
-        uses: zaproxy/action-full-scan@v0.10.0
+      - name: Scan de imagem Docker com Trivy
+        uses: aquasecurity/trivy-action@master
         with:
-          target: "http://localhost:3000"
+          image-ref: secure-api
+          severity: CRITICAL,HIGH
+          exit-code: 1
