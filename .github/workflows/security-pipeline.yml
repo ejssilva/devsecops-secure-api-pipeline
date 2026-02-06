@@ -1,4 +1,4 @@
-name: DevSecOps Security Pipeline
+name: DevSecOps Secure Pipeline
 
 on:
   push:
@@ -6,34 +6,48 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
-  security:
+  security-pipeline:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configurar Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Instalar dependências
-        run: npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - name: SAST com Semgrep
-        uses: returntocorp/semgrep-action@v1
+      - name: Run unit tests
+        run: npm test --if-present
 
-      - name: Scan de dependências (npm audit)
+      - name: Dependency vulnerability scan (npm audit)
         run: npm audit --audit-level=high
 
-      - name: Build da imagem Docker
+      - name: Static code analysis (Semgrep)
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: "p/security-audit"
+
+      - name: Build Docker image
         run: docker build -t secure-api .
 
-      - name: Scan de imagem Docker com Trivy
+      - name: Container image vulnerability scan (Trivy)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: secure-api
           severity: CRITICAL,HIGH
           exit-code: 1
+
+      - name: Generate SBOM (Supply Chain)
+        uses: anchore/sbom-action@v0
+        with:
+          image: secure-api
