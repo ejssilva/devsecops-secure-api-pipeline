@@ -13,6 +13,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Debug - List Files
+        run: |
+          echo "--- Raiz do Repositório ---"
+          ls -F
+          echo "--- Conteúdo de .github ---"
+          ls -R .github
+          
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
