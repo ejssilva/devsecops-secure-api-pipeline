@@ -19,13 +19,13 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm install
-        working-directory: ./.github/workflows
+        working-directory: .github/workflows
       - name: Run security audit
         run: npm audit --audit-level=high
-        working-directory: ./.github/workflows
+        working-directory: .github/workflows
       - name: Build Docker image
         run: docker build -t secure-api .
-        working-directory: ./.github/workflows
+        working-directory: .github/workflows
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@0.19.0
         with:
