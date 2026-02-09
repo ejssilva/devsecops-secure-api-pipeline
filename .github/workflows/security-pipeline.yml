@@ -13,19 +13,33 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Move files to root
+        run: |
+          echo "Organizando arquivos para o pipeline..."
+          # Encontra e move o package.json de qualquer pasta 'workflows' para a raiz
+          find .github -name "package.json" -exec mv {} . \;
+          # Encontra e move o index.js de qualquer pasta 'workflows' para a raiz
+          find .github -name "index.js" -exec mv {} . \;
+          # Encontra e move o Dockerfile de qualquer pasta 'workflows' para a raiz
+          find .github -name "Dockerfile" -exec mv {} . \;
+          echo "Arquivos na raiz após organização:"
+          ls -F
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Install dependencies
         run: npm install
-        working-directory: '.github/workflows '
+
       - name: Run security audit
         run: npm audit --audit-level=high
-        working-directory: '.github/workflows '
+
       - name: Build Docker image
         run: docker build -t secure-api .
-        working-directory: .github/workflows
+
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@0.19.0
         with:
