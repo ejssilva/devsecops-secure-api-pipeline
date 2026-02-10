@@ -14,17 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Move files to root
-        run: |
-          echo "Organizando arquivos para o pipeline..."
-          # Encontra e move o package.json de qualquer pasta 'workflows' para a raiz
-          find .github -name "package.json" -exec mv {} . \;
-          # Encontra e move o index.js de qualquer pasta 'workflows' para a raiz
-          find .github -name "index.js" -exec mv {} . \;
-          # Encontra e move o Dockerfile de qualquer pasta 'workflows' para a raiz
-          find .github -name "Dockerfile" -exec mv {} . \;
-          echo "Arquivos na raiz após organização:"
-          ls -F
+     
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
